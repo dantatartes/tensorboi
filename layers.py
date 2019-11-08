@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Module:
-    __slots__ = '_train'
+    __slots__ = '_train', 'output'
 
     def __init__(self):
         self._train = True
@@ -27,7 +27,7 @@ class Module:
 
 
 class Sequential(Module):
-    __slots__ = 'layers', 'output'
+    __slots__ = 'layers'
 
     def __init__(self, *layers):
         super().__init__()
@@ -48,13 +48,13 @@ class Sequential(Module):
 
         return grad_input
 
-    def parameters(self):
+    def parameters(self) -> list:
         res = []
         for l in self.layers:
             res += l.parameters()
         return res
 
-    def grad_parameters(self):
+    def grad_parameters(self) -> list:
         res = []
         for l in self.layers:
             res += l.grad_parameters()
@@ -70,7 +70,7 @@ class Sequential(Module):
 
 
 class Linear(Module):
-    __slots__ = 'W', 'b', 'grad_W', 'grad_b', 'output'
+    __slots__ = 'W', 'b', 'grad_W', 'grad_b'
 
     def __init__(self, dim_in, dim_out):
         super().__init__()
@@ -85,10 +85,7 @@ class Linear(Module):
 
     def backward(self, input, grad_output):
         self.grad_b = np.mean(grad_output, axis=0)
-
-        #     in_dim x batch_size
         self.grad_W = np.dot(input.T, grad_output)
-        #                 batch_size x out_dim
 
         grad_input = np.dot(grad_output, self.W.T)
 
